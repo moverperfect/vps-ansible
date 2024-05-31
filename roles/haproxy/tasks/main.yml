@@ -1,0 +1,40 @@
+---
+- name: Install software-properties-common
+  apt:
+    name: software-properties-common
+    state: present
+
+- name: Add HAProxy PPA
+  apt_repository:
+    repo: ppa:vbernat/haproxy-2.8
+    state: present
+
+- name: Update APT cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install HAProxy 2.8.\*
+  apt:
+    name: haproxy=2.8.*
+    state: present
+
+- name: Copy haproxy config
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg.tmp
+
+- name: Validate haproxy config
+  command: haproxy -f /etc/haproxy/haproxy.cfg.tmp -c
+  register: haproxy_config
+  changed_when: false
+  failed_when: haproxy_config.rc != 0
+
+- name: Copy haproxy config to correct location
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart haproxy

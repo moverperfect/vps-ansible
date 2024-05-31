@@ -1,0 +1,31 @@
+---
+- name: Create directory for prometheus
+  file:
+    path: /etc/prometheus
+    state: directory
+    mode: 0755
+
+- name: Copy config for prometheus
+  template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: 0644
+
+- name: Create docker volume for prometheus
+  docker_volume:
+    name: prometheus
+
+- name: Create prometheus container
+  docker_container:
+    name: prometheus-1
+    image: prom/prometheus:latest
+    pull: yes
+    restart_policy: always
+    volumes:
+      - /etc/prometheus:/etc/prometheus
+      - docker_prometheus-data:/prometheus
+    networks:
+      - name: docker_backend 
+        aliases:
+          - prometheus
+        ipv4_address: 172.20.0.2

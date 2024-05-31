@@ -1,0 +1,14 @@
+---
+- name: Run fail2ban-exporter docker image
+  docker_container:
+    name: fail2ban-exporter-1
+    image: registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:latest
+    pull: yes
+    restart_policy: always
+    volumes:
+      - /var/run/fail2ban:/var/run/fail2ban:ro
+    networks:
+      - name: docker_backend
+        aliases:
+          - fail2ban-exporter
+        ipv4_address: 172.20.0.3

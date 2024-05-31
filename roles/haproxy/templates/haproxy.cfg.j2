@@ -1,0 +1,84 @@
+userlist mycreds
+        user {{ haproxy_username }} insecure-password {{ haproxy_password }}
+
+global
+        log /dev/log    local0
+        log /dev/log    local1 notice
+        chroot /var/lib/haproxy
+        stats socket /run/haproxy/admin.sock mode 660 level admin
+        stats socket /var/run/haproxy.sock mode 600 expose-fd listeners level user
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
+
+        # Default SSL material locations
+        ca-base /etc/ssl/certs
+        crt-base /etc/ssl/private
+
+        # See: https://ssl-config.mozilla.org/#server=haproxy&server-version=2.0.3&config=intermediate
+        ssl-default-bind-ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+        ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+defaults
+        log     global
+        mode    http
+        option  httplog
+        option  dontlognull
+        timeout connect 5000
+        timeout client  50000
+        timeout server  50000
+        errorfile 400 /etc/haproxy/errors/400.http
+        errorfile 403 /etc/haproxy/errors/403.http
+        errorfile 408 /etc/haproxy/errors/408.http
+        errorfile 500 /etc/haproxy/errors/500.http
+        errorfile 502 /etc/haproxy/errors/502.http
+        errorfile 503 /etc/haproxy/errors/503.http
+        errorfile 504 /etc/haproxy/errors/504.http
+
+frontend cloudflare
+        bind 0.0.0.0:80
+        bind 0.0.0.0:443 ssl crt /etc/ssl/private
+        use_backend prometheus if { hdr(host) -m dom prometheus.moverperfect.com }
+        use_backend grafana if { hdr(host) -m dom grafana.moverperfect.com }
+        use_backend test_wedding if { hdr(host) -m dom test.moverperfect.com || hdr(host) -m dom test.jackandeleanor.co.uk }
+        use_backend vaultwarden if { hdr(host) -m dom bitwarden.moverperfect.com }
+        use_backend radarr if { hdr(host) -m dom radarr.moverperfect.com }
+        use_backend sonarr if { hdr(host) -m dom sonarr.moverperfect.com }
+        use_backend deluge if { hdr(host) -m dom deluge.moverperfect.com }
+        default_backend no-match
+
+frontend stats
+        bind 0.0.0.0:8404
+        http-request use-service prometheus-exporter if { path /metrics }
+        stats enable
+        stats uri /stats
+        stats refresh 10s
+
+
+backend vaultwarden
+        server server1 172.20.0.5:80 check
+
+backend prometheus
+        http-request auth unless { http_auth(mycreds) }
+        server server1 172.20.0.2:9090 check
+
+backend grafana
+        server server1 172.20.0.4:3000 check
+
+backend test_wedding
+        server server1 172.20.1.2:3000
+
+backend radarr
+        server aura {{ radarr_host }} check
+
+backend sonarr
+        server aura {{ sonarr_host }} check
+
+backend deluge
+        http-request set-path /moverperfect/deluge/%[path,regsub(^/moverperfect/deluge/,/)]
+        server aura {{ deluge_host }} ssl verify none check
+
+backend no-match
+        http-request deny deny_status 404

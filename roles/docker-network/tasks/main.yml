@@ -1,0 +1,8 @@
+---
+- name: Create docker network 172.20.0.0/16
+  docker_network:
+    name: docker_backend
+    driver: bridge
+    ipam_config:
+      - subnet: 172.20.0.0/16
+        gateway: 172.20.0.1

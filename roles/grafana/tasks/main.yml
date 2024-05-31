@@ -1,0 +1,18 @@
+---
+- name: Create docker volume for grafana
+  docker_volume:
+    name: docker_grafana-data
+
+- name: Create grafana container
+  docker_container:
+    name: grafana-1
+    image: grafana/grafana:latest
+    pull: yes
+    restart_policy: always
+    volumes:
+      - docker_grafana-data:/var/lib/grafana
+    networks:
+      - name: docker_backend
+        aliases:
+          - grafana
+        ipv4_address: 172.20.0.4

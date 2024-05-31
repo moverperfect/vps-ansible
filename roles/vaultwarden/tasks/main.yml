@@ -1,0 +1,19 @@
+---
+- name: Create vaultwarden folder
+  file:
+    path: /vw-data
+    state: directory
+
+- name: Create vaultwarden container
+  docker_container:
+    name: vaultwarden-1
+    image: vaultwarden/server:latest
+    pull: yes
+    restart_policy: always
+    volumes:
+      - /vw-data/:/data/
+    networks:
+      - name: docker_backend
+        aliases:
+          - vaultwarden
+        ipv4_address: 172.20.0.5

@@ -1,0 +1,81 @@
+---
+- name: Update apt repo and cache
+  apt: 
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+  changed_when: false
+
+- name: Upgrade all packages on servers
+  apt:
+    upgrade: dist 
+    force_apt_get: yes
+
+- name: Check if a reboot is needed on all servers
+  register: reboot_required_file
+  stat:
+    path: /var/run/reboot-required 
+
+- name: Reboot the box if kernel updated
+  reboot:
+    msg: "Reboot initiated by Ansible for kernel updates"
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+  when: reboot_required_file.stat.exists
+
+- name: Set timezone
+  timezone:
+    name: Europe/London
+
+- name: Ensure .ssh directory exists
+  file:
+    path: "~/.ssh"
+    state: directory
+    mode: '0700'
+
+- name: Add authorized keys
+  copy:
+    dest: "~/.ssh/authorized_keys"
+    content: "{{ lookup('file', 'authorized_keys') }}"
+    mode: '0600'
+
+- name: Install htop
+  apt:
+    name:
+      - htop
+    state: latest
+
+- name: Disable root login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin no'
+    state: present
+  notify: restart sshd
+
+- name: Disable password login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    state: present
+  notify: restart sshd
+
+- name: Disable empty password login
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords'
+    line: 'PermitEmptyPasswords no'
+    state: present
+  notify: restart sshd
+
+- name: Disable IPv6 ssh
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#?AddressFamily'
+    line: 'AddressFamily inet'
+    state: present
+  notify: restart sshd

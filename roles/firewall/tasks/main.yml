@@ -1,0 +1,24 @@
+---
+- name: Install ufw
+  apt:
+    name: ufw
+    state: present
+
+- name: Allow SSH
+  ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+
+- name: Allow all rfc1918 addresses
+  ufw:
+    rule: allow
+    src: "{{ item }}"
+  with_items:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+
+- name: Enable ufw
+  ufw:
+    state: enabled

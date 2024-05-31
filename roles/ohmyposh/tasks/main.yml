@@ -1,0 +1,30 @@
+---
+- name: Install unzip
+  apt:
+    name: unzip
+    state: latest
+
+- name: Check if oh-my-posh is installed in /usr/local/bin
+  stat:
+    path: /usr/local/bin/oh-my-posh
+  register: oh_my_posh_bin
+
+- name: Install oh-my-posh
+  shell: curl -s https://ohmyposh.dev/install.sh | bash -s
+  when: not oh_my_posh_bin.stat.exists
+
+- name: Create oh-my-posh config directory
+  file:
+    path: /home/{{ ansible_user }}/.oh-my-posh/custom
+    state: directory
+
+- name: Copy oh-my-posh config
+  copy:
+    src: tokyo.omp.json
+    dest: /home/{{ ansible_user }}/.oh-my-posh/custom/tokyo.omp.json
+
+- name: Add oh-my-posh to bashrc
+  lineinfile:
+    dest: /home/{{ ansible_user }}/.bashrc
+    line: eval "$(oh-my-posh init bash --config ~/.oh-my-posh/custom/tokyo.omp.json)"
+    state: present
