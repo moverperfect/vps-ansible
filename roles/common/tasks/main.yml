@@ -1,20 +1,20 @@
 ---
 - name: Update apt repo and cache
-  apt: 
-    update_cache: yes
-    force_apt_get: yes
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
     cache_valid_time: 3600
   changed_when: false
 
 - name: Upgrade all packages on servers
-  apt:
-    upgrade: dist 
-    force_apt_get: yes
+  ansible.builtin.apt:
+    upgrade: dist
+    force_apt_get: true
 
 - name: Check if a reboot is needed on all servers
   register: reboot_required_file
   stat:
-    path: /var/run/reboot-required 
+    path: /var/run/reboot-required
 
 - name: Reboot the box if kernel updated
   reboot:
@@ -34,13 +34,13 @@
   file:
     path: "~/.ssh"
     state: directory
-    mode: '0700'
+    mode: "0700"
 
 - name: Add authorized keys
   copy:
     dest: "~/.ssh/authorized_keys"
     content: "{{ lookup('file', 'authorized_keys') }}"
-    mode: '0600'
+    mode: "0600"
 
 - name: Install htop
   apt:
@@ -51,31 +51,31 @@
 - name: Disable root login
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^PermitRootLogin'
-    line: 'PermitRootLogin no'
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin no"
     state: present
-  notify: restart sshd
+  notify: Restart sshd
 
 - name: Disable password login
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^PasswordAuthentication'
-    line: 'PasswordAuthentication no'
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
     state: present
-  notify: restart sshd
+  notify: Restart sshd
 
 - name: Disable empty password login
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^PermitEmptyPasswords'
-    line: 'PermitEmptyPasswords no'
+    regexp: "^PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
     state: present
-  notify: restart sshd
+  notify: Restart sshd
 
 - name: Disable IPv6 ssh
   lineinfile:
     dest: /etc/ssh/sshd_config
-    regexp: '^#?AddressFamily'
-    line: 'AddressFamily inet'
+    regexp: "^#?AddressFamily"
+    line: "AddressFamily inet"
     state: present
-  notify: restart sshd
+  notify: Restart sshd

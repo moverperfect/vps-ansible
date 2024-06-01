@@ -20,6 +20,9 @@ ansible_host: 0.0.0.0
 ansible_user: 
 haproxy_username: 
 haproxy_password:
+radarr_host:
+sonarr_host:
+deluge_host:
 ```
 3. Run the playbook
 

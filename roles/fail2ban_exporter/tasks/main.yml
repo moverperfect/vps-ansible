@@ -3,7 +3,7 @@
   docker_container:
     name: fail2ban-exporter-1
     image: registry.gitlab.com/hectorjsmith/fail2ban-prometheus-exporter:latest
-    pull: yes
+    pull: true
     restart_policy: always
     volumes:
       - /var/run/fail2ban:/var/run/fail2ban:ro

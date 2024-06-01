@@ -1,18 +1,19 @@
 ---
-- hosts: all
+- name: Setup server
+  hosts: all
   become: true
   roles:
     - role: common
     - role: fail2ban
-    - role: fail2ban-exporter
-      tags: fail2ban-exporter
+    - role: fail2ban_exporter
+      tags: fail2ban_exporter
     - role: ohmyposh
     - role: docker
     - role: firewall
     - role: haproxy
       tags: haproxy
-    - role: docker-network
-      tags: docker-network
+    - role: docker_network
+      tags: docker_network
     - role: prometheus
       tags: prometheus
     - role: grafana

@@ -9,8 +9,15 @@
     path: /usr/local/bin/oh-my-posh
   register: oh_my_posh_bin
 
+- name: Download oh-my-posh
+  get_url:
+    url: https://ohmyposh.dev/install.sh
+    dest: /tmp/install.sh
+    mode: "0755"
+  when: not oh_my_posh_bin.stat.exists
+
 - name: Install oh-my-posh
-  shell: curl -s https://ohmyposh.dev/install.sh | bash -s
+  command: /tmp/install.sh
   when: not oh_my_posh_bin.stat.exists
 
 - name: Create oh-my-posh config directory

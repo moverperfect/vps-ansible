@@ -10,7 +10,7 @@
   file:
     path: /etc/apt/keyrings
     state: directory
-    mode: 0755
+    mode: "0755"
 
 - name: Add Docker GPG apt key
   apt_key:
@@ -18,10 +18,10 @@
     state: present
     keyring: /etc/apt/keyrings/docker.asc
 
-- name: docker.asc file permissions
+- name: Set file permissions on Docker GPG apt key
   file:
     path: /etc/apt/keyrings/docker.asc
-    mode: 0644
+    mode: "0644"
 
 - name: Add Docker apt repository
   apt_repository:
@@ -33,7 +33,7 @@
 - name: Update apt cache
   when: add_repo.changed
   apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 3600
 
 - name: Install Docker
@@ -50,13 +50,19 @@
   user:
     name: "{{ ansible_user }}"
     groups: docker
-    append: yes
+    append: true
 
 - name: Start Docker
   service:
     name: docker
     state: started
-    enabled: yes
+    enabled: true
 
 - name: Docker prune
-  command: docker system prune -a -f
+  community.docker.docker_prune:
+    containers: true
+    images: true
+    networks: true
+    volumes: true
+    builder_cache: true
+  changed_when: false

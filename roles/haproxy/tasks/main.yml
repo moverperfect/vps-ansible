@@ -36,5 +36,5 @@
     dest: /etc/haproxy/haproxy.cfg
     owner: root
     group: root
-    mode: 0644
-  notify: restart haproxy
+    mode: "0644"
+  notify: Restart haproxy
