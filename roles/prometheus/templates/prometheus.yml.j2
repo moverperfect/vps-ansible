@@ -35,7 +35,7 @@ scrape_configs:
     - localhost:9090
 - job_name: 'haproxy'
   static_configs:
-  - targets: ['172.20.0.1:8404']
+  - targets: ['host.docker.internal:8404']
 - job_name: 'fail2ban'
   static_configs:
   - targets: ['fail2ban-exporter:9191']

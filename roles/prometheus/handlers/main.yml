@@ -1,0 +1,6 @@
+---
+- name: Restart prometheus
+  docker_container:
+    name: prometheus-1
+    state: restarted
+  failed_when: false

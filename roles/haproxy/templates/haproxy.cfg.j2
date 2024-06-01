@@ -58,17 +58,17 @@ frontend stats
 
 
 backend vaultwarden
-        server server1 172.20.0.5:80 check
+        server server1 vaultwarden-1:80 check
 
 backend prometheus
         http-request auth unless { http_auth(mycreds) }
-        server server1 172.20.0.2:9090 check
+        server server1 prometheus-1:9090 check
 
 backend grafana
-        server server1 172.20.0.4:3000 check
+        server server1 grafana-1:3000 check
 
 backend test_wedding
-        server server1 172.20.1.2:3000
+        server server1 wedding-pr-preview:3000
 
 backend radarr
         server aura {{ radarr_host }} check
