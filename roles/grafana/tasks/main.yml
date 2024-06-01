@@ -15,4 +15,5 @@
       - name: docker_backend
         aliases:
           - grafana
-        ipv4_address: 172.20.0.4
+    etc_hosts:
+      host.docker.internal: "{{ docker_network.network.IPAM.Config[0].Gateway }}"

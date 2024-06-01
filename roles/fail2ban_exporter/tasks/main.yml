@@ -11,4 +11,3 @@
       - name: docker_backend
         aliases:
           - fail2ban-exporter
-        ipv4_address: 172.20.0.3

@@ -10,6 +10,8 @@
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
     mode: "0644"
+  notify:
+    - Restart prometheus
 
 - name: Create docker volume for prometheus
   docker_volume:
@@ -28,4 +30,5 @@
       - name: docker_backend
         aliases:
           - prometheus
-        ipv4_address: 172.20.0.2
+    etc_hosts:
+      host.docker.internal: "{{ docker_network.network.IPAM.Config[0].Gateway }}"

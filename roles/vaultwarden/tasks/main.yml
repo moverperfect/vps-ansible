@@ -16,4 +16,3 @@
       - name: docker_backend
         aliases:
           - vaultwarden
-        ipv4_address: 172.20.0.5
