@@ -7,7 +7,7 @@
   docker_container:
     name: grafana-1
     image: grafana/grafana:latest
-    pull: yes
+    pull: true
     restart_policy: always
     volumes:
       - docker_grafana-data:/var/lib/grafana

@@ -8,7 +8,7 @@
   docker_container:
     name: vaultwarden-1
     image: vaultwarden/server:latest
-    pull: yes
+    pull: true
     restart_policy: always
     volumes:
       - /vw-data/:/data/

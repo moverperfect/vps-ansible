@@ -2,4 +2,4 @@
 dependencies:
   - { role: docker }
   - { role: fail2ban }
-  - { role: docker-network }
+  - { role: docker_network }

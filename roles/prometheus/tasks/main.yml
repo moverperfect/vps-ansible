@@ -3,13 +3,13 @@
   file:
     path: /etc/prometheus
     state: directory
-    mode: 0755
+    mode: "0755"
 
 - name: Copy config for prometheus
   template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
-    mode: 0644
+    mode: "0644"
 
 - name: Create docker volume for prometheus
   docker_volume:
@@ -19,13 +19,13 @@
   docker_container:
     name: prometheus-1
     image: prom/prometheus:latest
-    pull: yes
+    pull: true
     restart_policy: always
     volumes:
       - /etc/prometheus:/etc/prometheus
       - docker_prometheus-data:/prometheus
     networks:
-      - name: docker_backend 
+      - name: docker_backend
         aliases:
           - prometheus
         ipv4_address: 172.20.0.2
